@@ -16,13 +16,17 @@
 
    > Чем ближе **средние значения** и  **общее среднее занчение** к ***0***, тем лучше.
 
+## Сторонние библиотеки
+
+Используется библиотека для работы с матрицами и векторами [Eigen](https://gitlab.com/libeigen/eigen)
+
 ## Сборка и установка
 
 ```bash
 git clone https://github.com/Arjentix/wise-tech-task
 cd wise-tech-task
 git submodule init
-git submodule update
+git submodule update --progress
 cmake -Bbuild . && cmake --build build --target install
 ```
 
