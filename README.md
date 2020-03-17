@@ -20,6 +20,7 @@
 
 ```bash
 git clone https://github.com/Arjentix/wise-tech-task
+cd wise-tech-task
 git submodule init
 git submodule update
 cmake -Bbuild . && cmake --build build --target install
