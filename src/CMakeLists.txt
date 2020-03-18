@@ -34,3 +34,6 @@ target_link_libraries(wise_tech_task
   satellite
   les
 )
+
+# Installing
+install(TARGETS wise_tech_task DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../bin)
