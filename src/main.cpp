@@ -64,14 +64,10 @@ int main(int argc, char **argv) {
   // Speeding up input/output
   std::ios_base::sync_with_stdio(false);
 
+  Eigen::Vector3d coords;
   try {
     // Storing information from input file
     auto [satellites, time_counter] = satellite::ReadFromFile(argv[1]);
-
-    // Objects for all accumulated data,
-    // which will be replenished on each iteration
-    Eigen::MatrixXd general_coef_mat(0, 3);
-    Eigen::VectorXd general_value_vec(0);
 
     for (int i = 3; i <= time_counter; ++i) {
       cout << "<--- " << i << " --->" << endl;
@@ -80,29 +76,14 @@ int main(int argc, char **argv) {
       auto [coef_mat, value_vec] = les::ConstructCoefficientsAndValues(
           satellites, i);
 
-      // Repleneshing general datasets
-      general_coef_mat = ConcatenateMatrices(std::move(general_coef_mat),
-                                             coef_mat);
-      general_value_vec = ConcatenateMatrices(std::move(general_value_vec),
-                                             value_vec);
-
-      // Calculating coordinares depending on all information for this moment
-      Eigen::Vector3d general_x = les::ApplyLeastSquares(general_coef_mat,
-                                                        general_value_vec);
-      cout << "General for this moment:\n";
-      PrintCoordinates(general_x);
+      coords = les::ApplyLeastSquares(coef_mat, value_vec);
+      PrintCoordinates(coords);
     }
-
-    // Calculating coordinates depends on all existing data
-    Eigen::Vector3d general_x = les::ApplyLeastSquares(general_coef_mat,
-                                                       general_value_vec);
-    cout << "<--- General --->" << endl;
-    PrintCoordinates(general_x);
 
     // Running checking
     // This is a very expensive function
-    cout << "<--- Checking --->" << endl;
-    Check(satellites, general_x);
+    cout << "<--- Checking for last result --->" << endl;
+    Check(satellites, coords);
   }
   catch (std::exception& ex) {
     cerr << ex.what() << endl;
@@ -120,15 +101,6 @@ bool CheckIfOnEarth(const Eigen::Vector3d& coords) {
   }
 
   return true;
-}
-
-Eigen::MatrixXd ConcatenateMatrices(Eigen::MatrixXd&& upper,
-                                    Eigen::MatrixXd&& lower) {
-  Eigen::MatrixXd tmp_mat(upper.rows() + lower.rows(), upper.cols());
-  tmp_mat << std::move(upper),
-             std::move(lower);
-
-  return tmp_mat;
 }
 
 void PrintCoordinates(const Eigen::Vector3d& coords) {
